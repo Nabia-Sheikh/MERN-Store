@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
 const Users = require("../models/User.js");
@@ -40,5 +41,19 @@ router.get("/", async (req, res) => {
       res.status(404).json({ message: "Book not found" });
     }
   });
-  
+
+  router.post('/signup', async (req, res) => {
+    console.log(req.body)
+    let { email, password, name } = req.body;
+
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(password, salt);
+    console.log(hash);
+    if(hash) {
+        const newUser = {name , email, password: hash}
+        const newUserDb = await Users.create(newUser);
+        console.log(newUserDb);
+        res.json({user: newUserDb, message: "new user created successfully"}).status(201);
+    }
+})  
 module.exports = router;
